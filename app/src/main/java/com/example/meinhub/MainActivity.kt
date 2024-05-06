@@ -3,20 +3,29 @@ package com.example.meinhub
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,9 +40,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -128,7 +140,7 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
             .padding(innerPadding)
             .verticalScroll(rememberScrollState())
     ) {
-        Row(modifier = Modifier.padding(12.dp)) {
+        Row (modifier = Modifier.padding(12.dp)) {
             Text(
                 text = "About application",
                 color = MaterialTheme.colorScheme.secondary,
@@ -137,7 +149,7 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
                 fontWeight = FontWeight.Bold
             )
         }
-        Row(modifier = Modifier.padding(8.dp)) {
+        Row (modifier = Modifier.padding(8.dp)) {
             val aboutText =
                 "This app was created to show my books, my favourite footballers and cars, that I like." +
                         " See more about me by clicking buttons below"
@@ -249,25 +261,112 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BookScreenContent(navHostController: NavHostController, innerPadding: PaddingValues) {
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        initialPageOffsetFraction = 0f
+    ){4}
+    val Books = listOf(
+        R.drawable.english4it_book,
+        R.drawable.physics_book,
+        R.drawable.investing_book,
+        R.drawable.learning_tutorial_book
+    )
+
+    val BooksDescriptions = listOf(
+        "This book is, in my opinion, suitable for persons, who want to learn " +
+                "english vocabulary used in IT",
+        "This book is, in my opinion perfect for persons, who want to prepare " +
+                "for Physics A-levels exam",
+        "This book is good for persons, who wants to learn basics and advanced aspects of investing",
+        "By reading this book you will found out, how to learn effectively"
+    )
+
+    val BooksTitles = listOf(
+        "English 4 IT",
+        "Fizyka Zakres rozszerzony",
+        "Inwestowanie w złoto i srebro",
+        "Włam się do mózgu"
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding)
+
     ) {
-        Row {
-            Text(
-                text = "English 4 IT", color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
-                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
-            )
+        Row (modifier = Modifier.padding(12.dp)) {
+            Box(modifier = Modifier.fillMaxWidth()){
+                IconButton(modifier = Modifier.align(Alignment.CenterStart),
+                    onClick = { /* do something */ }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Localized description"
+                    )
+                }
+
+                IconButton(modifier = Modifier.align(Alignment.CenterEnd),
+                    onClick = { /* do something */ }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowForward,
+                        contentDescription = "Localized description"
+                    )
+                }
+            }
         }
-        Row {
-            Image(
-                painter = painterResource(id = R.drawable.english4it_book),
-                contentDescription = "Book photo"
-            )
+        Box(modifier = Modifier.fillMaxSize()) {
+            HorizontalPager(state = pagerState,
+                key = {Books[it]}
+                ) {
+                index ->
+
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = BooksTitles[index],
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Row {
+                        Image(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(0.dp, 520.dp),
+                            painter = painterResource(Books[index]),
+                            contentDescription = "Book photo",
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    Row(modifier = Modifier.padding(20.dp)) {
+                        Text(
+                            text = BooksDescriptions[index],
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontSize = 20.sp,
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.Light,
+                            textAlign = TextAlign.Justify
+                        )
+                    }
+                }
+            }
         }
+
+
     }
 }
 
@@ -278,8 +377,9 @@ fun FootballerScreenContent(navHostController: NavHostController, innerPadding: 
         modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding)
+            .verticalScroll(rememberScrollState())
     ) {
-        Row {
+        Row(modifier = Modifier.padding(12.dp)) {
             Text(
                 text = "Leo Messi", color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
                 fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
@@ -300,19 +400,57 @@ fun CarScreenContent(navHostController: NavHostController, innerPadding: Padding
         modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding)
+
     ) {
-        Row {
-            Text(
-                text = "VW Golf", color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
-                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
-            )
+        Row (modifier = Modifier.padding(12.dp)) {
+            Box(modifier = Modifier.fillMaxWidth()){
+                IconButton(modifier = Modifier.align(Alignment.CenterStart),
+                    onClick = { /* do something */ }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Localized description"
+                    )
+                }
+
+                IconButton(modifier = Modifier.align(Alignment.CenterEnd),
+                    onClick = { /* do something */ }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowForward,
+                        contentDescription = "Localized description"
+                    )
+                }
+            }
         }
-        Row {
-            Image(
-                painter = painterResource(id = R.drawable.golf),
-                contentDescription = "Car photo"
-            )
+        Column(modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(8.dp)){
+            Row (modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth()) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "VW Golf", color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
+                )
+            }
+            Row {
+                Image(
+                    painter = painterResource(id = R.drawable.golf),
+                    contentDescription = "Car photo"
+                )
+            }
+            Row (modifier = Modifier.padding(20.dp)) {
+                val aboutCarText = "Volkswagen Golf is a nice and reliable car, delightful with its style. " +
+                        "It is the most popular car model in Europe"
+                Text(
+                    text = aboutCarText, color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
+                    fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Light,
+                    textAlign = TextAlign.Justify
+                )
+            }
         }
+
     }
 }
 

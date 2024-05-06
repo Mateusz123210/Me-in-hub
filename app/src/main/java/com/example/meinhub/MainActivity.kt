@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -66,7 +68,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CenterAlignedTopAppBarExample() {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-
+    val navController: NavHostController = rememberNavController()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
 
@@ -76,7 +78,14 @@ fun CenterAlignedTopAppBarExample() {
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                title = { Text("Me in Hub") },
+                title = { Text(text = "Me in Hub",
+                    modifier = Modifier.clickable(
+                        interactionSource = MutableInteractionSource(),
+                        indication = null,
+                        onClick = {navController.navigate("MainScreen")}
+                    )
+
+                    ) },
                 navigationIcon = {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(
@@ -88,39 +97,22 @@ fun CenterAlignedTopAppBarExample() {
             )
         },
     ) { innerPadding ->
-        ComposeNavigation(innerPadding)
+        ComposeNavigation(navController, innerPadding)
     }
 }
 
-//@Composable
-//fun ComposeNavigation() {
-//
-//    val navController = rememberNavController()
-//
-//    NavHost(navController = navController, startDestination = "First"){
-//        composable("First"){
-//            FirstScreen()
-//        }
-//        composable("Second"){
-//            SecondScreen()
-//        }
-//    }
-//
-//}
-//
-//sealed class Routes(val route: String) {
-//    object Login : Routes("Login")
-//    object Signup : Routes("Signup")
-//}
-//
 @Composable
-fun ComposeNavigation(innerPadding: PaddingValues) {
-
-    val navController = rememberNavController()
+fun ComposeNavigation(navController: NavHostController,innerPadding: PaddingValues) {
 
     NavHost(navController = navController, startDestination = "MainScreen"){
         composable("MainScreen"){
             MainScreenContent(navController, innerPadding = innerPadding)
+        }
+        composable("Books"){
+            BookScreenContent(navController, innerPadding = innerPadding)
+        }
+        composable("Footballers"){
+            FootballerScreenContent(navController, innerPadding = innerPadding)
         }
         composable("Cars"){
             CarScreenContent(navController, innerPadding = innerPadding)
@@ -167,7 +159,8 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
             ) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
-                        modifier = Modifier.fillMaxWidth(), onClick = { /* doSomething() */ },
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { navHostController.navigate("Books") },
                         colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
                     ) {
                         Column {
@@ -195,7 +188,8 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
                 }
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
-                        modifier = Modifier.fillMaxWidth(), onClick = { /* doSomething() */ },
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { navHostController.navigate("Footballers") },
                         colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
                     ) {
                         Column {
@@ -256,6 +250,51 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
 }
 
 @Composable
+fun BookScreenContent(navHostController: NavHostController, innerPadding: PaddingValues) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(innerPadding)
+    ) {
+        Row {
+            Text(
+                text = "English 4 IT", color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
+                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
+            )
+        }
+        Row {
+            Image(
+                painter = painterResource(id = R.drawable.english4it_book),
+                contentDescription = "Book photo"
+            )
+        }
+    }
+}
+
+
+@Composable
+fun FootballerScreenContent(navHostController: NavHostController, innerPadding: PaddingValues) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(innerPadding)
+    ) {
+        Row {
+            Text(
+                text = "Leo Messi", color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
+                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
+            )
+        }
+        Row {
+            Image(
+                painter = painterResource(id = R.drawable.messi_photo),
+                contentDescription = "Leo Messi photo"
+            )
+        }
+    }
+}
+
+@Composable
 fun CarScreenContent(navHostController: NavHostController, innerPadding: PaddingValues) {
     Column(
         modifier = Modifier
@@ -271,8 +310,9 @@ fun CarScreenContent(navHostController: NavHostController, innerPadding: Padding
         Row {
             Image(
                 painter = painterResource(id = R.drawable.golf),
-                contentDescription = "My photo"
+                contentDescription = "Car photo"
             )
         }
     }
 }
+

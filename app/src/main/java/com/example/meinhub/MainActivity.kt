@@ -38,9 +38,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.meinhub.ui.theme.ButtonColor
 import com.example.meinhub.ui.theme.MeInHubTheme
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,93 +88,163 @@ fun CenterAlignedTopAppBarExample() {
             )
         },
     ) { innerPadding ->
-        ScrollContent(innerPadding)
+        ComposeNavigation(innerPadding)
+    }
+}
+
+//@Composable
+//fun ComposeNavigation() {
+//
+//    val navController = rememberNavController()
+//
+//    NavHost(navController = navController, startDestination = "First"){
+//        composable("First"){
+//            FirstScreen()
+//        }
+//        composable("Second"){
+//            SecondScreen()
+//        }
+//    }
+//
+//}
+//
+//sealed class Routes(val route: String) {
+//    object Login : Routes("Login")
+//    object Signup : Routes("Signup")
+//}
+//
+@Composable
+fun ComposeNavigation(innerPadding: PaddingValues) {
+
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "MainScreen"){
+        composable("MainScreen"){
+            MainScreenContent(navController, innerPadding = innerPadding)
+        }
+        composable("Cars"){
+            CarScreenContent(navController, innerPadding = innerPadding)
+        }
     }
 }
 
 @Composable
-fun ScrollContent(innerPadding: PaddingValues) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(innerPadding)
-        .verticalScroll(rememberScrollState())) {
-        Row (modifier = Modifier.padding(12.dp)) {
-            Text(text = "About application", color = MaterialTheme.colorScheme.secondary, fontSize = 32.sp,
-                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold)
+fun MainScreenContent(navHostController: NavHostController, innerPadding: PaddingValues) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(innerPadding)
+            .verticalScroll(rememberScrollState())
+    ) {
+        Row(modifier = Modifier.padding(12.dp)) {
+            Text(
+                text = "About application",
+                color = MaterialTheme.colorScheme.secondary,
+                fontSize = 32.sp,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight.Bold
+            )
         }
-        Row (modifier = Modifier.padding(8.dp)) {
-            val aboutText = "This app was created to show my books, my favourite footballers and cars, that I like." +
-                    " See more about me by clicking buttons below"
-            Text(text = aboutText, color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
-                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Light)
+        Row(modifier = Modifier.padding(8.dp)) {
+            val aboutText =
+                "This app was created to show my books, my favourite footballers and cars, that I like." +
+                        " See more about me by clicking buttons below"
+            Text(
+                text = aboutText, color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
+                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Light
+            )
         }
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp).padding(top=50.dp)) {
-            Column (modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(30.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .padding(top = 50.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(30.dp)
+            ) {
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    Button(modifier = Modifier.fillMaxWidth(), onClick = { /* doSomething() */},
+                    Button(
+                        modifier = Modifier.fillMaxWidth(), onClick = { /* doSomething() */ },
                         colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
-                        ) {
+                    ) {
                         Column {
-                            Row (horizontalArrangement = Arrangement.Center) {
+                            Row(horizontalArrangement = Arrangement.Center) {
                                 Image(
-                                    modifier = Modifier.fillMaxWidth().requiredHeight(80.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .requiredHeight(80.dp),
                                     painter = painterResource(id = R.drawable.book),
                                     contentDescription = "Book photo"
                                 )
                             }
                             Row {
-                                Text(text = "My books",
+                                Text(
+                                    text = "My books",
                                     modifier = Modifier.fillMaxWidth(),
                                     textAlign = TextAlign.Center,
                                     color = Color.Black, fontSize = 20.sp,
-                                    fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold)
+                                    fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
+                                )
                             }
                         }
 
                     }
                 }
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    Button(modifier = Modifier.fillMaxWidth(), onClick = { /* doSomething() */},
-                        colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)) {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(), onClick = { /* doSomething() */ },
+                        colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
+                    ) {
                         Column {
-                            Row (horizontalArrangement = Arrangement.Center) {
+                            Row(horizontalArrangement = Arrangement.Center) {
                                 Image(
-                                    modifier = Modifier.fillMaxWidth().requiredHeight(80.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .requiredHeight(80.dp),
                                     painter = painterResource(id = R.drawable.footballer),
                                     contentDescription = "Footballer photo"
                                 )
                             }
                             Row {
-                                Text(text = "My favourite footballers",
+                                Text(
+                                    text = "My favourite footballers",
                                     modifier = Modifier.fillMaxWidth(),
                                     textAlign = TextAlign.Center,
                                     color = Color.Black, fontSize = 20.sp,
-                                    fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold)
+                                    fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
+                                )
                             }
                         }
 
                     }
                 }
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    Button(modifier = Modifier.fillMaxWidth(), onClick = { /* doSomething() */},
-                        colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)) {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { navHostController.navigate("Cars")},
+                        colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
+                    ) {
                         Column {
-                            Row (horizontalArrangement = Arrangement.Center) {
+                            Row(horizontalArrangement = Arrangement.Center) {
                                 Image(
-                                    modifier = Modifier.fillMaxWidth().requiredHeight(80.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .requiredHeight(80.dp),
                                     painter = painterResource(id = R.drawable.car),
                                     contentDescription = "Car photo"
                                 )
                             }
                             Row {
-                                Text(text = "Cars, that I like",
+                                Text(
+                                    text = "Cars, that I like",
                                     modifier = Modifier.fillMaxWidth(),
                                     textAlign = TextAlign.Center,
                                     color = Color.Black, fontSize = 20.sp,
-                                    fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold)
+                                    fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
+                                )
                             }
                         }
 
@@ -183,13 +256,17 @@ fun ScrollContent(innerPadding: PaddingValues) {
 }
 
 @Composable
-fun GolfPage(innerPadding: PaddingValues){
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(innerPadding)) {
+fun CarScreenContent(navHostController: NavHostController, innerPadding: PaddingValues) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(innerPadding)
+    ) {
         Row {
-            Text(text = "VW Golf", color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
-                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold)
+            Text(
+                text = "VW Golf", color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
+                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
+            )
         }
         Row {
             Image(

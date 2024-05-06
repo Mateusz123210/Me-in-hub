@@ -40,12 +40,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -58,6 +58,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.meinhub.ui.theme.ButtonColor
 import com.example.meinhub.ui.theme.MeInHubTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -268,6 +269,7 @@ fun BookScreenContent(navHostController: NavHostController, innerPadding: Paddin
         initialPage = 0,
         initialPageOffsetFraction = 0f
     ){4}
+    val scope = rememberCoroutineScope()
     val Books = listOf(
         R.drawable.english4it_book,
         R.drawable.physics_book,
@@ -299,20 +301,31 @@ fun BookScreenContent(navHostController: NavHostController, innerPadding: Paddin
     ) {
         Row (modifier = Modifier.padding(12.dp)) {
             Box(modifier = Modifier.fillMaxWidth()){
-                IconButton(modifier = Modifier.align(Alignment.CenterStart),
-                    onClick = { /* do something */ }) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Localized description"
-                    )
+                if(pagerState.currentPage != 0) {
+                    IconButton(modifier = Modifier.align(Alignment.CenterStart),
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                            }
+                        }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Localized description"
+                        )
+                    }
                 }
-
-                IconButton(modifier = Modifier.align(Alignment.CenterEnd),
-                    onClick = { /* do something */ }) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowForward,
-                        contentDescription = "Localized description"
-                    )
+                if(pagerState.currentPage != pagerState.pageCount - 1) {
+                    IconButton(modifier = Modifier.align(Alignment.CenterEnd),
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = "Localized description"
+                        )
+                    }
                 }
             }
         }

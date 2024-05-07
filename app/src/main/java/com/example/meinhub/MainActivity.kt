@@ -40,7 +40,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -270,14 +275,14 @@ fun BookScreenContent(navHostController: NavHostController, innerPadding: Paddin
         initialPageOffsetFraction = 0f
     ){4}
     val scope = rememberCoroutineScope()
-    val Books = listOf(
+    val books = listOf(
         R.drawable.english4it_book,
         R.drawable.physics_book,
         R.drawable.investing_book,
         R.drawable.learning_tutorial_book
     )
 
-    val BooksDescriptions = listOf(
+    val booksDescriptions = listOf(
         "This book is, in my opinion, suitable for persons, who want to learn " +
                 "english vocabulary used in IT",
         "This book is, in my opinion perfect for persons, who want to prepare " +
@@ -286,7 +291,7 @@ fun BookScreenContent(navHostController: NavHostController, innerPadding: Paddin
         "By reading this book you will found out, how to learn effectively"
     )
 
-    val BooksTitles = listOf(
+    val booksTitles = listOf(
         "English 4 IT",
         "Fizyka Zakres rozszerzony",
         "Inwestowanie w złoto i srebro",
@@ -331,7 +336,7 @@ fun BookScreenContent(navHostController: NavHostController, innerPadding: Paddin
         }
         Box(modifier = Modifier.fillMaxSize()) {
             HorizontalPager(state = pagerState,
-                key = {Books[it]}
+                key = {books[it]}
                 ) {
                 index ->
 
@@ -347,7 +352,7 @@ fun BookScreenContent(navHostController: NavHostController, innerPadding: Paddin
                     ) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = BooksTitles[index],
+                            text = booksTitles[index],
                             color = MaterialTheme.colorScheme.secondary,
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center,
@@ -360,14 +365,14 @@ fun BookScreenContent(navHostController: NavHostController, innerPadding: Paddin
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .heightIn(0.dp, 520.dp),
-                            painter = painterResource(Books[index]),
+                            painter = painterResource(books[index]),
                             contentDescription = "Book photo",
                             contentScale = ContentScale.Crop
                         )
                     }
                     Row(modifier = Modifier.padding(20.dp)) {
                         Text(
-                            text = BooksDescriptions[index],
+                            text = booksDescriptions[index],
                             color = MaterialTheme.colorScheme.secondary,
                             fontSize = 20.sp,
                             fontFamily = FontFamily.SansSerif,
@@ -407,8 +412,73 @@ fun FootballerScreenContent(navHostController: NavHostController, innerPadding: 
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CarScreenContent(navHostController: NavHostController, innerPadding: PaddingValues) {
+
+    var carIndex by remember { mutableIntStateOf(0) }
+    val scope = rememberCoroutineScope()
+
+    val audi = listOf(
+        R.drawable.audi_rs6_photo,
+        R.drawable.audi_rs6_photo1,
+        R.drawable.audi_rs6_photo2
+    )
+
+    val golf = listOf(
+        R.drawable.golf,
+        R.drawable.golf_2
+    )
+
+    val bmw = listOf(
+        R.drawable.bmw_m5,
+        R.drawable.bmw_m5_1
+    )
+
+    val opel = listOf(
+        R.drawable.opel_astra
+    )
+
+    val cars = listOf(
+        audi,
+        golf,
+        bmw,
+        opel
+    )
+    val states = listOf(
+        rememberPagerState(
+            initialPage = 0,
+        initialPageOffsetFraction = 0f
+        ){3},
+        rememberPagerState(
+            initialPage = 0,
+            initialPageOffsetFraction = 0f
+        ){2},
+        rememberPagerState(
+            initialPage = 0,
+            initialPageOffsetFraction = 0f
+        ){2},
+        rememberPagerState(
+            initialPage = 0,
+            initialPageOffsetFraction = 0f
+        ){1},
+    )
+
+    val carsDescriptions = listOf(
+        "Audi RS6 is a sport car ideal for persons, who want to feel sport driving and to persons " + "" +
+                "who has a family and need more space for yourself and load in trunk",
+        "Volkswagen Golf is a nice and reliable car, delightful with its style. " +
+                "It is the most popular car model in Europe",
+        "BMW M5 is beautiful and comfortable car, ideal for persons, who like rear drive",
+        "Opel Astra is a cheap car, but comfortable. This car is one of the most popular cars on the world"
+    )
+
+    val carsNames = listOf(
+        "Audi RS6",
+        "WV Golf",
+        "BMW M5",
+        "Opel Astra"
+    )
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -417,20 +487,31 @@ fun CarScreenContent(navHostController: NavHostController, innerPadding: Padding
     ) {
         Row (modifier = Modifier.padding(12.dp)) {
             Box(modifier = Modifier.fillMaxWidth()){
-                IconButton(modifier = Modifier.align(Alignment.CenterStart),
-                    onClick = { /* do something */ }) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Localized description"
-                    )
+                if(carIndex != 0) {
+                    IconButton(modifier = Modifier.align(Alignment.CenterStart),
+                        onClick = {
+                            scope.launch {
+                                carIndex -= 1
+                            }
+                        }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Localized description"
+                        )
+                    }
                 }
-
-                IconButton(modifier = Modifier.align(Alignment.CenterEnd),
-                    onClick = { /* do something */ }) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowForward,
-                        contentDescription = "Localized description"
-                    )
+                if(carIndex != cars.size - 1) {
+                    IconButton(modifier = Modifier.align(Alignment.CenterEnd),
+                        onClick = {
+                            scope.launch {
+                                carIndex += 1
+                            }
+                        }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = "Localized description"
+                        )
+                    }
                 }
             }
         }
@@ -442,23 +523,45 @@ fun CarScreenContent(navHostController: NavHostController, innerPadding: Padding
                 .fillMaxWidth()) {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
-                    text = "VW Golf", color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
+                    text = carsNames[carIndex],
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 20.sp,
                     textAlign = TextAlign.Center,
-                    fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold
                 )
             }
             Row {
-                Image(
-                    painter = painterResource(id = R.drawable.golf),
-                    contentDescription = "Car photo"
+                Box(modifier = Modifier.fillMaxSize()) {
+                    HorizontalPager(state = states[carIndex],
+
+                    ) { index ->
+                        Image(
+                            painter = painterResource(cars[carIndex][index]),
+                            contentDescription = "Car photo"
+                        )
+
+                    }
+                }
+            }
+            Row(modifier = Modifier.fillMaxWidth().padding(2.dp)) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "Photo " + (states[carIndex].currentPage + 1) + "/" + states[carIndex].pageCount,
+                    color = Color.Black,
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
                 )
             }
             Row (modifier = Modifier.padding(20.dp)) {
-                val aboutCarText = "Volkswagen Golf is a nice and reliable car, delightful with its style. " +
-                        "It is the most popular car model in Europe"
                 Text(
-                    text = aboutCarText, color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
-                    fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Light,
+                    text = carsDescriptions[carIndex],
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Light,
                     textAlign = TextAlign.Justify
                 )
             }

@@ -389,26 +389,127 @@ fun BookScreenContent(navHostController: NavHostController, innerPadding: Paddin
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FootballerScreenContent(navHostController: NavHostController, innerPadding: PaddingValues) {
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        initialPageOffsetFraction = 0f
+    ){4}
+    val scope = rememberCoroutineScope()
+    val footballers = listOf(
+        R.drawable.messi_photo,
+        R.drawable.ronaldo_photo,
+        R.drawable.lewandowski_photo,
+        R.drawable.blaszczykowski_photo
+    )
+
+    val footballersDescriptions = listOf(
+        "Leo Messi is one of the best footballers on the World. " +
+                "He is known from his goals and assists. The most goals he has scored for FC Barcelona",
+        "Cristiano Ronaldo is one of the best footballers on the world. " +
+                "He can strike very well from distance and using his head",
+        "Robert Lewandowski is typical attacker, one of the best on the world. " +
+        "Currently he plays for the FC Barcelona club",
+        "Jakub Błaszczykowski is one of the best polish footballers. " +
+        "He scored many goals for Polish National Team. He is known from, that " +
+        "he has difficult childhood, but he never gave up"
+    )
+
+    val footballersNames = listOf(
+        "Leo Messi",
+        "Cristiano Ronaldo",
+        "Robert Lewandowski",
+        "Jakub Błaszczykowski"
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding)
-            .verticalScroll(rememberScrollState())
+
     ) {
-        Row(modifier = Modifier.padding(12.dp)) {
-            Text(
-                text = "Leo Messi", color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
-                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
-            )
+        Row (modifier = Modifier.padding(12.dp)) {
+            Box(modifier = Modifier.fillMaxWidth()){
+                if(pagerState.currentPage != 0) {
+                    IconButton(modifier = Modifier.align(Alignment.CenterStart),
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                            }
+                        }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Localized description"
+                        )
+                    }
+                }
+                if(pagerState.currentPage != pagerState.pageCount - 1) {
+                    IconButton(modifier = Modifier.align(Alignment.CenterEnd),
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = "Localized description"
+                        )
+                    }
+                }
+            }
         }
-        Row {
-            Image(
-                painter = painterResource(id = R.drawable.messi_photo),
-                contentDescription = "Leo Messi photo"
-            )
+        Box(modifier = Modifier.fillMaxSize()) {
+            HorizontalPager(state = pagerState,
+                key = {footballers[it]}
+            ) {
+                    index ->
+
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = footballersNames[index],
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Row {
+                        Image(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(0.dp, 520.dp),
+                            painter = painterResource(footballers[index]),
+                            contentDescription = "Footballer photo",
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    Row(modifier = Modifier.padding(20.dp)) {
+                        Text(
+                            text = footballersDescriptions[index],
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontSize = 20.sp,
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.Light,
+                            textAlign = TextAlign.Justify
+                        )
+                    }
+                }
+            }
         }
+
+
     }
 }
 

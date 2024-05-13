@@ -1,6 +1,11 @@
 package com.example.meinhub
 
+
+import android.net.Uri
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
+import android.widget.MediaController
+import android.widget.VideoView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -19,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,19 +54,29 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
+import coil.size.Size
 import com.example.meinhub.ui.theme.ButtonColor
 import com.example.meinhub.ui.theme.MeInHubTheme
 import kotlinx.coroutines.launch
@@ -403,6 +419,7 @@ fun FootballerScreenContent(navHostController: NavHostController, innerPadding: 
         R.drawable.lewandowski_photo,
         R.drawable.blaszczykowski_photo
     )
+    var showMore by remember { mutableStateOf(false) }
 
     val footballersDescriptions = listOf(
         "Leo Messi is one of the best footballers on the World. " +
@@ -422,95 +439,272 @@ fun FootballerScreenContent(navHostController: NavHostController, innerPadding: 
         "Robert Lewandowski",
         "Jakub Błaszczykowski"
     )
+    if(!showMore){
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(innerPadding)
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(innerPadding)
-
-    ) {
-        Row (modifier = Modifier.padding(12.dp)) {
-            Box(modifier = Modifier.fillMaxWidth()){
-                if(pagerState.currentPage != 0) {
-                    IconButton(modifier = Modifier.align(Alignment.CenterStart),
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                            }
-                        }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Localized description"
-                        )
+        ) {
+            Row (modifier = Modifier.padding(12.dp)) {
+                Box(modifier = Modifier.fillMaxWidth()){
+                    if(pagerState.currentPage != 0) {
+                        IconButton(modifier = Modifier.align(Alignment.CenterStart),
+                            onClick = {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                                }
+                            }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Localized description"
+                            )
+                        }
+                    }
+                    if(pagerState.currentPage != pagerState.pageCount - 1) {
+                        IconButton(modifier = Modifier.align(Alignment.CenterEnd),
+                            onClick = {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                                }
+                            }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowForward,
+                                contentDescription = "Localized description"
+                            )
+                        }
                     }
                 }
-                if(pagerState.currentPage != pagerState.pageCount - 1) {
-                    IconButton(modifier = Modifier.align(Alignment.CenterEnd),
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                            }
-                        }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowForward,
-                            contentDescription = "Localized description"
-                        )
+            }
+            Box(modifier = Modifier.fillMaxSize()) {
+                HorizontalPager(state = pagerState,
+                    key = {footballers[it]}
+                ) {
+                        index ->
+
+                    Column(
+                        modifier = Modifier
+                            .verticalScroll(rememberScrollState())
+                            .padding(8.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = footballersNames[index],
+                                color = MaterialTheme.colorScheme.secondary,
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Center,
+                                fontFamily = FontFamily.SansSerif,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Row {
+                            Image(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(0.dp, 520.dp),
+                                painter = painterResource(footballers[index]),
+                                contentDescription = "Footballer photo",
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                        Row(modifier = Modifier.padding(20.dp)) {
+                            Text(
+                                text = footballersDescriptions[index],
+                                color = MaterialTheme.colorScheme.secondary,
+                                fontSize = 20.sp,
+                                fontFamily = FontFamily.SansSerif,
+                                fontWeight = FontWeight.Light,
+                                textAlign = TextAlign.Justify
+                            )
+                        }
+
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = { showMore = true },
+                            colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
+                        ) {
+
+                            Text(
+                                text = "Show more ...",
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                color = Color.Black, fontSize = 24.sp,
+                                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
+                            )
+
+
+                        }
+
                     }
                 }
             }
         }
-        Box(modifier = Modifier.fillMaxSize()) {
-            HorizontalPager(state = pagerState,
-                key = {footballers[it]}
-            ) {
-                    index ->
+    }else{
+        FootballerAudioAndVideo(innerPadding, onClick = { showMore = false }, pagerState)
 
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(8.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = footballersNames[index],
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                            fontFamily = FontFamily.SansSerif,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    Row {
-                        Image(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(0.dp, 520.dp),
-                            painter = painterResource(footballers[index]),
-                            contentDescription = "Footballer photo",
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                    Row(modifier = Modifier.padding(20.dp)) {
-                        Text(
-                            text = footballersDescriptions[index],
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 20.sp,
-                            fontFamily = FontFamily.SansSerif,
-                            fontWeight = FontWeight.Light,
-                            textAlign = TextAlign.Justify
-                        )
-                    }
-                }
+    }
+
+
+
+
+
+
+
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun FootballerAudioAndVideo(innerPadding: PaddingValues, onClick: () -> Unit, pagerState: PagerState) {
+
+    val filmsTitles = listOf("Messi best goals", "Ronaldo best goals")
+    val filmsUris = listOf("android.resource://com.example.meinhub/raw/messi_best_solo_goals",
+        "android.resource://com.example.meinhub/raw/ronaldo_best_goals")
+    val animationsTitles = listOf("Messi picks up the ball", "Ronaldo picks up the ball")
+    val animations = listOf(R.drawable.messi_animation, R.drawable.ronaldo_animation)
+
+    Column ( modifier = Modifier
+        .fillMaxWidth()
+        .padding(innerPadding)) {
+        if(pagerState.currentPage  < 2){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp)
+            ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = filmsTitles[pagerState.currentPage],
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 0.dp, top = 0.dp, end = 0.dp, bottom = 0.dp
+                    )
+            ) {
+                val videoUri =
+                    Uri.parse(filmsUris[pagerState.currentPage])
+                VideoPlayer(videoUri = videoUri)
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 32.dp)
+            ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = animationsTitles[pagerState.currentPage],
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .clip(RoundedCornerShape(16.dp))
+
+            ) {
+                GifImage(animation = animations[pagerState.currentPage])
+            }
+
+        }else{
+
+
+
+
+        }
+        Row (modifier = Modifier.fillMaxWidth().padding(top = 32.dp)) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onClick,
+                colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
+            ) {
+
+                Text(
+                    text = "Show less ...",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    color = Color.Black, fontSize = 24.sp,
+                    fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
+                )
+
+
             }
         }
 
 
     }
+}
+
+@Composable
+fun VideoPlayer(
+    videoUri: Uri
+) {
+
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clip(RoundedCornerShape(16.dp)),
+        factory = { context ->
+            VideoView(context).apply {
+                setVideoURI(videoUri)
+
+                val mediaController = MediaController(context)
+                mediaController.setAnchorView(this)
+
+                setMediaController(mediaController)
+
+                setOnPreparedListener {
+                    start()
+//                    seekTo(2000)
+
+
+//                    setZOrderOnTop(true)
+
+                }
+                setClipToOutline(true)
+            }
+        }
+    )
+}
+
+@Composable
+fun GifImage(
+    modifier: Modifier = Modifier,
+    animation: Int
+) {
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            add(ImageDecoderDecoder.Factory())
+        }
+        .build()
+    Image(
+        painter = rememberAsyncImagePainter(
+            ImageRequest.Builder(context).data(data = animation).apply(block = {
+                size(Size.ORIGINAL)
+            }).build(), imageLoader = imageLoader
+        ),
+        contentDescription = null,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -645,7 +839,9 @@ fun CarScreenContent(navHostController: NavHostController, innerPadding: Padding
                     }
                 }
             }
-            Row(modifier = Modifier.fillMaxWidth().padding(2.dp)) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(2.dp)) {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = "Photo " + (states[carIndex].currentPage + 1) + "/" + states[carIndex].pageCount,

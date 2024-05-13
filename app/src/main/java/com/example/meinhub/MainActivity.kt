@@ -53,6 +53,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -68,6 +70,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -75,6 +78,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -186,7 +190,8 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
                         " See more about me by clicking buttons below"
             Text(
                 text = aboutText, color = MaterialTheme.colorScheme.secondary, fontSize = 20.sp,
-                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Light
+                fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Light,
+                textAlign = TextAlign.Justify
             )
         }
 
@@ -578,9 +583,29 @@ fun FootballerAudioAndVideo(innerPadding: PaddingValues, onClick: () -> Unit, pa
 
     var audioPlayed by remember { mutableStateOf(false) }
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+//    LaunchedEffect(lifecycleState) {
+//        // Do something with your state
+//        // You may want to use DisposableEffect or other alternatives
+//        // instead of LaunchedEffect
+//        when (lifecycleState) {
+//            Lifecycle.State.DESTROYED -> {
+//                mediaPlayers[0].pause()
+//                mediaPlayers[1].pause()
+//            }
+//            Lifecycle.State.INITIALIZED -> {}
+//            Lifecycle.State.CREATED -> {}
+//            Lifecycle.State.STARTED -> {}
+//            Lifecycle.State.RESUMED -> {}
+//        }
+//    }
+
     Column ( modifier = Modifier
         .fillMaxWidth()
-        .padding(innerPadding)) {
+        .padding(innerPadding)
+        ) {
         if(pagerState.currentPage  < 2){
             Row(
                 modifier = Modifier
@@ -696,7 +721,10 @@ fun FootballerAudioAndVideo(innerPadding: PaddingValues, onClick: () -> Unit, pa
             .padding(top = 32.dp)) {
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = onClick,
+                onClick = ({
+                    mediaPlayers[pagerState.currentPage - 2].pause()
+                    onClick()
+                }),
                 colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
             ) {
 

@@ -1,6 +1,7 @@
 package com.example.meinhub
 
 
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
@@ -10,6 +11,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -17,16 +19,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -56,8 +63,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -546,15 +555,7 @@ fun FootballerScreenContent(navHostController: NavHostController, innerPadding: 
         }
     }else{
         FootballerAudioAndVideo(innerPadding, onClick = { showMore = false }, pagerState)
-
     }
-
-
-
-
-
-
-
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -566,6 +567,16 @@ fun FootballerAudioAndVideo(innerPadding: PaddingValues, onClick: () -> Unit, pa
         "android.resource://com.example.meinhub/raw/ronaldo_best_goals")
     val animationsTitles = listOf("Messi picks up the ball", "Ronaldo picks up the ball")
     val animations = listOf(R.drawable.messi_animation, R.drawable.ronaldo_animation)
+    val context = LocalContext.current
+    val mediaPlayers = listOf(MediaPlayer.create(context, R.raw.lewandowski_interview),
+        MediaPlayer.create(context, R.raw.blaszczykowski_interview))
+    val audioTitles = listOf("Interview with Robert Lewandowski",
+        "Interview with Jakub Błaszczykowski")
+
+    val audioDescriptions = listOf("Robert Lewandowski talks about yourself and current Barcelona form in spanish",
+        "Interview before match with Germany in 2023 year")
+
+    var audioPlayed by remember { mutableStateOf(false) }
 
     Column ( modifier = Modifier
         .fillMaxWidth()
@@ -624,12 +635,65 @@ fun FootballerAudioAndVideo(innerPadding: PaddingValues, onClick: () -> Unit, pa
             }
 
         }else{
+            Row(modifier = Modifier
+                .fillMaxWidth(). padding(12.dp)){
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = audioTitles[pagerState.currentPage - 2],
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Left,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Row (modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp).background(MaterialTheme.colorScheme.primaryContainer),
+                horizontalArrangement = Arrangement.Center){
+                Column(modifier = Modifier.padding(top = 12.dp, bottom = 12.dp)){
+                    Button(
+                        onClick = {mediaPlayers[pagerState.currentPage - 2].start()},
+                        modifier = Modifier
+                            .clip(RectangleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        content = {
+                            Image(modifier = Modifier.heightIn(max = 80.dp), painter = painterResource(id = R.drawable.play_icon), contentDescription = null)
 
+                        }
+                    )
+                }
+                Column(modifier = Modifier.padding(top = 12.dp, bottom = 12.dp)) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                Column (modifier = Modifier.padding(top = 12.dp, bottom = 12.dp)) {
+                    Button(
+                        onClick = {mediaPlayers[pagerState.currentPage - 2].pause()},
+                        modifier = Modifier
+                            .clip(RectangleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        content = {
+                            Image(modifier = Modifier.heightIn(max = 80.dp), painter = painterResource(id = R.drawable.pause_icon), contentDescription = null)
 
+                        }
+                    )
+                }
 
-
+            }
+            Row(modifier = Modifier.padding(12.dp)) {
+                Text(
+                    text = audioDescriptions[pagerState.currentPage - 2],
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Light,
+                    textAlign = TextAlign.Justify
+                )
+            }
         }
-        Row (modifier = Modifier.fillMaxWidth().padding(top = 32.dp)) {
+        Row (modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 32.dp)) {
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onClick,

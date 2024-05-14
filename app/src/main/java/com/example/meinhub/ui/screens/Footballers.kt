@@ -4,6 +4,12 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.widget.MediaController
 import android.widget.VideoView
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +51,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -83,6 +91,20 @@ fun FootballerScreenContent(navHostController: NavHostController, innerPadding: 
         R.drawable.blaszczykowski_photo
     )
     var showMore by remember { mutableStateOf(false) }
+    val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.5f,
+        animationSpec = infiniteRepeatable(tween(4000), RepeatMode.Reverse),
+        label = "scale"
+    )
+    val animatedColor by infiniteTransition.animateColor(
+        initialValue = Color(0xFF000000),
+        targetValue = MaterialTheme.colorScheme.secondary,
+//        targetValue = MaterialTheme.colorScheme.primaryContainer,
+        animationSpec = infiniteRepeatable(tween(4000), RepeatMode.Reverse),
+        label = "color"
+    )
 
     val footballersDescriptions = listOf(
         "Leo Messi is one of the best footballers on the World. " +
@@ -194,9 +216,14 @@ fun FootballerScreenContent(navHostController: NavHostController, innerPadding: 
 
                             Text(
                                 text = "Show more ...",
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth()
+                                .graphicsLayer {
+                                    scaleX = scale
+                                    scaleY = scale
+                                    transformOrigin = TransformOrigin.Center
+                                },
                                 textAlign = TextAlign.Center,
-                                color = Color.Black, fontSize = 24.sp,
+                                color = animatedColor, fontSize = 24.sp,
                                 fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
                             )
                         }

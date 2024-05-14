@@ -149,7 +149,7 @@ fun CenterAlignedTopAppBarExample() {
                             if (!isClosed) close()
                         }
                     }
-//                    navController.navigate("Books") //change to parameterized navigation
+                    navController.navigate("Books/0")
                 }
             )
             NavigationDrawerItem(
@@ -160,7 +160,14 @@ fun CenterAlignedTopAppBarExample() {
                     fontFamily = FontFamily.SansSerif
                 )},
                 selected = false,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    scope.launch{
+                        drawerState.apply {
+                            if (!isClosed) close()
+                        }
+                    }
+                    navController.navigate("Books/1")
+                }
             )
             NavigationDrawerItem(
                 label = { Text(
@@ -170,7 +177,14 @@ fun CenterAlignedTopAppBarExample() {
                     fontFamily = FontFamily.SansSerif
                 )},
                 selected = false,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    scope.launch{
+                        drawerState.apply {
+                            if (!isClosed) close()
+                        }
+                    }
+                    navController.navigate("Books/2")
+                }
             )
             NavigationDrawerItem(
                 label = { Text(
@@ -180,7 +194,14 @@ fun CenterAlignedTopAppBarExample() {
                     fontFamily = FontFamily.SansSerif
                 )},
                 selected = false,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    scope.launch{
+                        drawerState.apply {
+                            if (!isClosed) close()
+                        }
+                    }
+                    navController.navigate("Books/3")
+                }
             )
             Column (modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
                 Divider()
@@ -204,7 +225,14 @@ fun CenterAlignedTopAppBarExample() {
                     fontFamily = FontFamily.SansSerif
                 )},
                 selected = false,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    scope.launch{
+                        drawerState.apply {
+                            if (!isClosed) close()
+                        }
+                    }
+                    navController.navigate("Footballers/0")
+                }
             )
             NavigationDrawerItem(
                 label = { Text(
@@ -214,7 +242,14 @@ fun CenterAlignedTopAppBarExample() {
                     fontFamily = FontFamily.SansSerif
                 )},
                 selected = false,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    scope.launch{
+                        drawerState.apply {
+                            if (!isClosed) close()
+                        }
+                    }
+                    navController.navigate("Footballers/1")
+                }
             )
             NavigationDrawerItem(
                 label = { Text(
@@ -224,7 +259,14 @@ fun CenterAlignedTopAppBarExample() {
                     fontFamily = FontFamily.SansSerif
                 )},
                 selected = false,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    scope.launch{
+                        drawerState.apply {
+                            if (!isClosed) close()
+                        }
+                    }
+                    navController.navigate("Footballers/2")
+                }
             )
             NavigationDrawerItem(
                 label = { Text(
@@ -234,7 +276,14 @@ fun CenterAlignedTopAppBarExample() {
                     fontFamily = FontFamily.SansSerif
                 )},
                 selected = false,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    scope.launch{
+                        drawerState.apply {
+                            if (!isClosed) close()
+                        }
+                    }
+                    navController.navigate("Footballers/3")
+                }
             )
             Column (modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
                 Divider()
@@ -258,7 +307,14 @@ fun CenterAlignedTopAppBarExample() {
                     fontFamily = FontFamily.SansSerif
                 )},
                 selected = false,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    scope.launch{
+                        drawerState.apply {
+                            if (!isClosed) close()
+                        }
+                    }
+                    navController.navigate("Cars/0")
+                }
             )
             NavigationDrawerItem(
                 label = { Text(
@@ -268,7 +324,14 @@ fun CenterAlignedTopAppBarExample() {
                     fontFamily = FontFamily.SansSerif
                 )},
                 selected = false,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    scope.launch{
+                        drawerState.apply {
+                            if (!isClosed) close()
+                        }
+                    }
+                    navController.navigate("Cars/1")
+                }
             )
             NavigationDrawerItem(
                 label = { Text(
@@ -278,7 +341,14 @@ fun CenterAlignedTopAppBarExample() {
                     fontFamily = FontFamily.SansSerif
                 )},
                 selected = false,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    scope.launch{
+                        drawerState.apply {
+                            if (!isClosed) close()
+                        }
+                    }
+                    navController.navigate("Cars/2")
+                }
             )
             NavigationDrawerItem(
                 label = { Text(
@@ -288,7 +358,14 @@ fun CenterAlignedTopAppBarExample() {
                     fontFamily = FontFamily.SansSerif
                 )},
                 selected = false,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    scope.launch{
+                        drawerState.apply {
+                            if (!isClosed) close()
+                        }
+                    }
+                    navController.navigate("Cars/3")
+                }
             )
         }
     }) {
@@ -345,14 +422,26 @@ fun ComposeNavigation(navController: NavHostController,innerPadding: PaddingValu
         composable("MainScreen"){
             MainScreenContent(navController, innerPadding = innerPadding)
         }
-        composable("Books"){
-            BookScreenContent(navController, innerPadding = innerPadding)
+        composable("Books/{id}"){
+            navBackStackEntry ->
+            val id = navBackStackEntry.arguments?.getString("id")
+            id?.let { id->
+                BookScreenContent(navController, innerPadding = innerPadding, id = id.toInt())
+            }
         }
-        composable("Footballers"){
-            FootballerScreenContent(navController, innerPadding = innerPadding)
+        composable("Footballers/{id}"){
+            navBackStackEntry ->
+            val id = navBackStackEntry.arguments?.getString("id")
+            id?.let { id->
+                FootballerScreenContent(navController, innerPadding = innerPadding, id = id.toInt())
+            }
         }
-        composable("Cars"){
-            CarScreenContent(navController, innerPadding = innerPadding)
+        composable("Cars/{id}"){
+            navBackStackEntry ->
+            val id = navBackStackEntry.arguments?.getString("id")
+            id?.let { id->
+                CarScreenContent(navController, innerPadding = innerPadding, id = id.toInt())
+            }
         }
     }
 }
@@ -398,7 +487,7 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = { navHostController.navigate("Books") },
+                        onClick = { navHostController.navigate("Books/0") },
                         colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
                     ) {
                         Column {
@@ -427,7 +516,7 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = { navHostController.navigate("Footballers") },
+                        onClick = { navHostController.navigate("Footballers/0") },
                         colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
                     ) {
                         Column {
@@ -456,7 +545,7 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = { navHostController.navigate("Cars")},
+                        onClick = { navHostController.navigate("Cars/0")},
                         colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
                     ) {
                         Column {
@@ -489,9 +578,9 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BookScreenContent(navHostController: NavHostController, innerPadding: PaddingValues) {
+fun BookScreenContent(navHostController: NavHostController, innerPadding: PaddingValues, id: Int) {
     val pagerState = rememberPagerState(
-        initialPage = 0,
+        initialPage = id,
         initialPageOffsetFraction = 0f
     ){4}
     val scope = rememberCoroutineScope()
@@ -611,9 +700,9 @@ fun BookScreenContent(navHostController: NavHostController, innerPadding: Paddin
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FootballerScreenContent(navHostController: NavHostController, innerPadding: PaddingValues) {
+fun FootballerScreenContent(navHostController: NavHostController, innerPadding: PaddingValues, id: Int) {
     val pagerState = rememberPagerState(
-        initialPage = 0,
+        initialPage = id,
         initialPageOffsetFraction = 0f
     ){4}
     val scope = rememberCoroutineScope()
@@ -983,9 +1072,9 @@ fun GifImage(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CarScreenContent(navHostController: NavHostController, innerPadding: PaddingValues) {
+fun CarScreenContent(navHostController: NavHostController, innerPadding: PaddingValues, id: Int) {
 
-    var carIndex by remember { mutableIntStateOf(0) }
+    var carIndex by remember { mutableIntStateOf(id) }
     val scope = rememberCoroutineScope()
 
     val audi = listOf(

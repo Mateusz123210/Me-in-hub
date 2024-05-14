@@ -3,7 +3,6 @@ package com.example.meinhub
 
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.widget.MediaController
 import android.widget.VideoView
@@ -25,15 +24,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -43,19 +38,23 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -69,7 +68,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -87,8 +85,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import coil.size.Size
@@ -96,12 +92,13 @@ import com.example.meinhub.ui.theme.ButtonColor
 import com.example.meinhub.ui.theme.MeInHubTheme
 import kotlinx.coroutines.launch
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MeInHubTheme {
-                // A surface container using the 'background' color from the theme
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -118,36 +115,227 @@ class MainActivity : ComponentActivity() {
 fun CenterAlignedTopAppBarExample() {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val navController: NavHostController = rememberNavController()
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-
-        topBar = {
-            CenterAlignedTopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = { Text(text = "Me in Hub",
-                    modifier = Modifier.clickable(
-                        interactionSource = MutableInteractionSource(),
-                        indication = null,
-                        onClick = {navController.navigate("MainScreen")}
-                    )
-
-                    ) },
-                navigationIcon = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Localized description"
-                        )
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+        ModalDrawerSheet (modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column (modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
+                Divider()
+                Text(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxSize(),
+                    text = "Books",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold
+                )
+                Divider()
+            }
+            NavigationDrawerItem(
+                label = { Text(
+                    text = "English 4 IT",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.SansSerif
+                )},
+                selected = false,
+                onClick = {
+                    scope.launch{
+                        drawerState.apply {
+                            if (!isClosed) close()
+                        }
                     }
+//                    navController.navigate("Books") //change to parameterized navigation
                 }
             )
-        },
-    ) { innerPadding ->
-        ComposeNavigation(navController, innerPadding)
+            NavigationDrawerItem(
+                label = { Text(
+                    text = "Fizyka Zakres rozszerzony",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.SansSerif
+                )},
+                selected = false,
+                onClick = { /*TODO*/ }
+            )
+            NavigationDrawerItem(
+                label = { Text(
+                    text = "Inwestowanie w złoto i srebro",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.SansSerif
+                )},
+                selected = false,
+                onClick = { /*TODO*/ }
+            )
+            NavigationDrawerItem(
+                label = { Text(
+                    text = "Włam się do mózgu",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.SansSerif
+                )},
+                selected = false,
+                onClick = { /*TODO*/ }
+            )
+            Column (modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
+                Divider()
+                Text(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxSize(),
+                    text = "Footballers",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold
+                )
+                Divider()
+            }
+            NavigationDrawerItem(
+                label = { Text(
+                    text = "Leo Messi",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.SansSerif
+                )},
+                selected = false,
+                onClick = { /*TODO*/ }
+            )
+            NavigationDrawerItem(
+                label = { Text(
+                    text = "Cristiano Ronaldo",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.SansSerif
+                )},
+                selected = false,
+                onClick = { /*TODO*/ }
+            )
+            NavigationDrawerItem(
+                label = { Text(
+                    text = "Robert Lewandowski",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.SansSerif
+                )},
+                selected = false,
+                onClick = { /*TODO*/ }
+            )
+            NavigationDrawerItem(
+                label = { Text(
+                    text = "Jakub Błaszczykowski",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.SansSerif
+                )},
+                selected = false,
+                onClick = { /*TODO*/ }
+            )
+            Column (modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
+                Divider()
+                Text(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxSize(),
+                    text = "Cars",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold
+                )
+                Divider()
+            }
+            NavigationDrawerItem(
+                label = { Text(
+                    text = "Audi RS6",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.SansSerif
+                )},
+                selected = false,
+                onClick = { /*TODO*/ }
+            )
+            NavigationDrawerItem(
+                label = { Text(
+                    text = "VW Golf",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.SansSerif
+                )},
+                selected = false,
+                onClick = { /*TODO*/ }
+            )
+            NavigationDrawerItem(
+                label = { Text(
+                    text = "BMW M5",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.SansSerif
+                )},
+                selected = false,
+                onClick = { /*TODO*/ }
+            )
+            NavigationDrawerItem(
+                label = { Text(
+                    text = "Opel Astra",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.SansSerif
+                )},
+                selected = false,
+                onClick = { /*TODO*/ }
+            )
+        }
+    }) {
+
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+
+            topBar = {
+                CenterAlignedTopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
+                    title = { Text(text = "Me in Hub",
+                        modifier = Modifier.clickable(
+                            interactionSource = MutableInteractionSource(),
+                            indication = null,
+                            onClick = {navController.navigate("MainScreen")}
+                        )
+
+                    ) },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                           scope.launch{
+                                drawerState.apply {
+                                    if (isClosed) open() else close()
+                                }
+
+                           }
+
+
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = "Localized description"
+                            )
+                        }
+                    }
+                )
+            },
+        ) { innerPadding ->
+            ComposeNavigation(navController, innerPadding)
+        }
+
     }
+
+
 }
 
 @Composable

@@ -115,7 +115,7 @@ fun FootballerScreenContent(navHostController: NavHostController, innerPadding: 
                 "Currently he plays for the FC Barcelona club",
         "Jakub Błaszczykowski is one of the best polish footballers. " +
                 "He scored many goals for Polish National Team. He is known from, that " +
-                "he has difficult childhood, but he never gave up"
+                "he had difficult childhood, but he never gave up"
     )
 
     val footballersNames = listOf(

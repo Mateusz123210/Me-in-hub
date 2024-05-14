@@ -98,7 +98,7 @@ fun CarScreenContent(navHostController: NavHostController, innerPadding: Padding
         "Volkswagen Golf is a nice and reliable car, delightful with its style. " +
                 "It is the most popular car model in Europe",
         "BMW M5 is beautiful and comfortable car, ideal for persons, who like rear drive",
-        "Opel Astra is a cheap car, but comfortable. This car is one of the most popular cars on the world"
+        "Opel Astra is a cheap car, but comfortable. This car model is one of the most popular car models on the world"
     )
 
     val carsNames = listOf(

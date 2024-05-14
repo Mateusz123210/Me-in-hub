@@ -53,6 +53,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -79,6 +80,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -520,10 +522,10 @@ fun FootballerScreenContent(navHostController: NavHostController, innerPadding: 
                             Image(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .heightIn(0.dp, 520.dp),
+                                    .heightIn(0.dp, 520.dp),  //responsiveness while commented
                                 painter = painterResource(footballers[index]),
                                 contentDescription = "Footballer photo",
-                                contentScale = ContentScale.Crop
+                                contentScale = ContentScale.Crop //responsiveness while commented
                             )
                         }
                         Row(modifier = Modifier.padding(20.dp)) {
@@ -550,10 +552,7 @@ fun FootballerScreenContent(navHostController: NavHostController, innerPadding: 
                                 color = Color.Black, fontSize = 24.sp,
                                 fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
                             )
-
-
                         }
-
                     }
                 }
             }
@@ -584,23 +583,23 @@ fun FootballerAudioAndVideo(innerPadding: PaddingValues, onClick: () -> Unit, pa
     var audioPlayed by remember { mutableStateOf(false) }
 
     val lifecycleOwner = LocalLifecycleOwner.current
-    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
 
-//    LaunchedEffect(lifecycleState) {
-//        // Do something with your state
-//        // You may want to use DisposableEffect or other alternatives
-//        // instead of LaunchedEffect
-//        when (lifecycleState) {
-//            Lifecycle.State.DESTROYED -> {
-//                mediaPlayers[0].pause()
-//                mediaPlayers[1].pause()
-//            }
-//            Lifecycle.State.INITIALIZED -> {}
-//            Lifecycle.State.CREATED -> {}
-//            Lifecycle.State.STARTED -> {}
-//            Lifecycle.State.RESUMED -> {}
-//        }
-//    }
+    DisposableEffect(lifecycleOwner) {
+
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                if (pagerState.currentPage >= 2){
+                    mediaPlayers[pagerState.currentPage - 2].pause()
+                }
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     Column ( modifier = Modifier
         .fillMaxWidth()
@@ -661,7 +660,8 @@ fun FootballerAudioAndVideo(innerPadding: PaddingValues, onClick: () -> Unit, pa
 
         }else{
             Row(modifier = Modifier
-                .fillMaxWidth(). padding(12.dp)){
+                .fillMaxWidth()
+                .padding(12.dp)){
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = audioTitles[pagerState.currentPage - 2],
@@ -674,7 +674,8 @@ fun FootballerAudioAndVideo(innerPadding: PaddingValues, onClick: () -> Unit, pa
             }
             Row (modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp).background(MaterialTheme.colorScheme.primaryContainer),
+                .padding(12.dp)
+                .background(MaterialTheme.colorScheme.primaryContainer),
                 horizontalArrangement = Arrangement.Center){
                 Column(modifier = Modifier.padding(top = 12.dp, bottom = 12.dp)){
                     Button(
@@ -689,7 +690,7 @@ fun FootballerAudioAndVideo(innerPadding: PaddingValues, onClick: () -> Unit, pa
                     )
                 }
                 Column(modifier = Modifier.padding(top = 12.dp, bottom = 12.dp)) {
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(32.dp))
                 }
                 Column (modifier = Modifier.padding(top = 12.dp, bottom = 12.dp)) {
                     Button(
@@ -722,7 +723,9 @@ fun FootballerAudioAndVideo(innerPadding: PaddingValues, onClick: () -> Unit, pa
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = ({
-                    mediaPlayers[pagerState.currentPage - 2].pause()
+                    if (pagerState.currentPage >= 2){
+                        mediaPlayers[pagerState.currentPage - 2].pause()
+                    }
                     onClick()
                 }),
                 colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
@@ -735,12 +738,8 @@ fun FootballerAudioAndVideo(innerPadding: PaddingValues, onClick: () -> Unit, pa
                     color = Color.Black, fontSize = 24.sp,
                     fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold
                 )
-
-
             }
         }
-
-
     }
 }
 
@@ -765,11 +764,6 @@ fun VideoPlayer(
 
                 setOnPreparedListener {
                     start()
-//                    seekTo(2000)
-
-
-//                    setZOrderOnTop(true)
-
                 }
                 setClipToOutline(true)
             }

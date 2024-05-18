@@ -70,7 +70,7 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = { navHostController.navigate("Books/0") },
+                        onClick = { navHostController.navigate("BooksPreview") },
                         colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
                     ) {
                         Column {
@@ -99,7 +99,7 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = { navHostController.navigate("Footballers/0") },
+                        onClick = { navHostController.navigate("FootballersPreview") },
                         colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
                     ) {
                         Column {
@@ -128,7 +128,7 @@ fun MainScreenContent(navHostController: NavHostController, innerPadding: Paddin
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = { navHostController.navigate("Cars/0")},
+                        onClick = { navHostController.navigate("CarsPreview")},
                         colors = ButtonDefaults.buttonColors(containerColor = ButtonColor)
                     ) {
                         Column {

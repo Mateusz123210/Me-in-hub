@@ -22,6 +22,9 @@ fun ComposeNavigation(navController: NavHostController, innerPadding: PaddingVal
                 BookScreenContent(navController, innerPadding = innerPadding, id = id.toInt())
             }
         }
+        composable("BooksPreview"){
+            BookPreviewScreenContent(navController, innerPadding = innerPadding)
+        }
         composable("Footballers/{id}"){
                 navBackStackEntry ->
             val id = navBackStackEntry.arguments?.getString("id")
@@ -29,12 +32,18 @@ fun ComposeNavigation(navController: NavHostController, innerPadding: PaddingVal
                 FootballerScreenContent(navController, innerPadding = innerPadding, id = id.toInt())
             }
         }
+        composable("FootballersPreview"){
+            FootballerPreviewScreenContent(navController, innerPadding = innerPadding)
+        }
         composable("Cars/{id}"){
                 navBackStackEntry ->
             val id = navBackStackEntry.arguments?.getString("id")
             id?.let { id->
                 CarScreenContent(navController, innerPadding = innerPadding, id = id.toInt())
             }
+        }
+        composable("CarsPreview"){
+            CarPreviewScreenContent(navController, innerPadding = innerPadding)
         }
     }
 }

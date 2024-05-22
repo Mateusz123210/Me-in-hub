@@ -394,7 +394,7 @@ fun FootballerAudioAndVideo(innerPadding: PaddingValues, onClick: () -> Unit, pa
         }
         Row (modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 32.dp)) {
+            .padding(top = 32.dp, start = 12.dp, end = 12.dp)) {
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = ({
